@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "712093207035",
+    "project_id": "shapely-eb950",
+    "storage_bucket": "shapely-eb950.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:712093207035:android:d131b6083ad4e6b80b235e",
+        "android_client_info": {
+          "package_name": "com.anonymous.shapely"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCGRBzSd5g4PlfO9FwojOqqADBoijKjeQM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
