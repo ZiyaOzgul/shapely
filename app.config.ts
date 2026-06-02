@@ -3,21 +3,19 @@ import { ConfigContext, ExpoConfig } from "expo/config";
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
 
-  // ─── App Identity ───────────────────────────────
   name: "Shapely",
   slug: "shapely",
   version: "1.0.0",
   scheme: "shapely",
+  owner: "lyzadev",
 
-  // ─── SDK & Runtime ──────────────────────────────
   sdkVersion: "55.0.0",
   platforms: ["ios", "android"],
   orientation: "portrait",
   userInterfaceStyle: "automatic",
-  // ─── Assets ─────────────────────────────────────
+
   icon: "./assets/shapely/logoShapely.png",
 
-  // ─── iOS ────────────────────────────────────────
   ios: {
     bundleIdentifier: "com.anonymous.shapely",
     buildNumber: "1",
@@ -29,7 +27,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     },
   },
 
-  // ─── Android ────────────────────────────────────
   android: {
     package: "com.anonymous.shapely",
     versionCode: 1,
@@ -43,13 +40,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     },
   },
 
-  // ─── Web ────────────────────────────────────────
   web: {
     output: "static",
     favicon: "./assets/images/favicon.png",
   },
 
-  // ─── Plugins ────────────────────────────────────
   plugins: [
     "expo-router",
     [
@@ -80,16 +75,14 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     ],
   ],
 
-  // ─── Experiments ────────────────────────────────
   experiments: {
     typedRoutes: true,
     reactCompiler: true,
   },
 
-  // ─── Extra ──────────────────────────────────────
   extra: {
     eas: {
-      projectId: "YOUR_PROJECT_ID",
+      projectId: "0827c374-d1b0-4ef7-9fff-90cb44fbcfeb",
     },
   },
 });
