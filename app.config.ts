@@ -15,7 +15,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   orientation: "portrait",
   userInterfaceStyle: "automatic",
   // ─── Assets ─────────────────────────────────────
-  icon: "./assets/images/icon.png",
+  icon: "./assets/shapely/logoShapely.png",
 
   // ─── iOS ────────────────────────────────────────
   ios: {
@@ -39,7 +39,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       foregroundImage: "./assets/images/android-icon-foreground.png",
       backgroundImage: "./assets/images/android-icon-background.png",
       monochromeImage: "./assets/images/android-icon-monochrome.png",
-      backgroundColor: "#0B1326",
+      backgroundColor: "#fff",
     },
   },
 
@@ -55,10 +55,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       "expo-splash-screen",
       {
-        image: "./assets/images/splash-icon.png",
+        image: "./assets/shapely/logoShapely.png",
         imageWidth: 200,
         resizeMode: "contain",
-        backgroundColor: "#0B1326",
+        backgroundColor: "#fff",
         dark: {
           backgroundColor: "#0B1326",
         },
@@ -68,6 +68,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "expo-image",
     "expo-web-browser",
     "expo-localization",
+    "expo-secure-store",
     "@react-native-firebase/app",
     [
       "expo-build-properties",

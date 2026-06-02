@@ -1,37 +1,56 @@
-import { useColorScheme, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { router } from "expo-router";
-import { LinearGradient } from "expo-linear-gradient";
-import { moderateScale, scale, verticalScale } from "react-native-size-matters";
 import { useTheme } from "@/hooks/useTheme";
+import { useThemeContext } from "@/contexts/ThemeContext";
+import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
+import { useTranslation } from "react-i18next";
+import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import {
+  Image,
+  ImageBackground,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { moderateScale, scale, verticalScale } from "react-native-size-matters";
+
+const logoShapely = require("@/assets/shapely/logoShapely.png");
 
 const bgLight = require("@/assets/shapely/splashLight.png");
 const bgDark = require("@/assets/shapely/splashDark.png");
 
 export default function WelcomeScreen() {
   const theme = useTheme();
-  const colorScheme = useColorScheme();
-  const bg = colorScheme === "dark" ? bgDark : bgLight;
+  const { isDark } = useThemeContext();
+  const { t } = useTranslation();
+  const bg = isDark ? bgDark : bgLight;
 
   return (
     <ImageBackground source={bg} style={styles.bg} resizeMode="cover">
       <SafeAreaView style={styles.safe}>
         <View style={styles.container}>
-
-          {/* Logo placeholder */}
-          <View style={[styles.logoOuter, { borderColor: theme.colors.border }]}>
-            <View style={[styles.logoInner, { backgroundColor: theme.colors.surfaceHigh }]} />
-          </View>
+          {/* Logo */}
+          <Animated.View entering={FadeIn.duration(500)}>
+            <Image
+              source={logoShapely}
+              style={styles.logoImage}
+              resizeMode="contain"
+            />
+          </Animated.View>
 
           {/* Text */}
-          <View style={styles.textSection}>
+          <Animated.View entering={FadeInDown.duration(400).delay(150)} style={styles.textSection}>
             <Text
               style={[
                 styles.title,
-                { color: theme.colors.textPrimary, fontFamily: theme.typography.fonts.bold },
+                {
+                  color: theme.colors.textPrimary,
+                  fontFamily: theme.typography.fonts.bold,
+                },
               ]}
             >
-              Shapely
+              {t('common.appName')}
             </Text>
             <Text
               style={[
@@ -43,12 +62,12 @@ export default function WelcomeScreen() {
                 },
               ]}
             >
-              Transform your words into platform‑ready content, powered by AI.
+              {t('welcome.subtitle')}
             </Text>
-          </View>
+          </Animated.View>
 
           {/* Buttons */}
-          <View style={styles.buttons}>
+          <Animated.View entering={FadeInDown.duration(400).delay(280)} style={styles.buttons}>
             <TouchableOpacity
               activeOpacity={0.85}
               onPress={() => router.push("/(auth)/login")}
@@ -62,10 +81,13 @@ export default function WelcomeScreen() {
                 <Text
                   style={[
                     styles.primaryBtnText,
-                    { fontFamily: theme.typography.fonts.semiBold, fontSize: moderateScale(16) },
+                    {
+                      fontFamily: theme.typography.fonts.semiBold,
+                      fontSize: moderateScale(16),
+                    },
                   ]}
                 >
-                  Get Started →
+                  {t('welcome.getStarted')}
                 </Text>
               </LinearGradient>
             </TouchableOpacity>
@@ -92,11 +114,10 @@ export default function WelcomeScreen() {
                   },
                 ]}
               >
-                Register
+                {t('welcome.register')}
               </Text>
             </TouchableOpacity>
-          </View>
-
+          </Animated.View>
         </View>
       </SafeAreaView>
     </ImageBackground>
@@ -116,19 +137,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: scale(32),
   },
-  logoOuter: {
-    width: moderateScale(80),
-    height: moderateScale(80),
-    borderRadius: moderateScale(20),
-    borderWidth: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: verticalScale(40),
-  },
-  logoInner: {
-    width: moderateScale(52),
-    height: moderateScale(52),
-    borderRadius: moderateScale(13),
+  logoImage: {
+    height: verticalScale(200),
+    width: scale(260),
+    marginBottom: verticalScale(0),
   },
   textSection: {
     alignItems: "center",

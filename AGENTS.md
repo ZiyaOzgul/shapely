@@ -1,4 +1,4 @@
-# Shapely — Claude Code Guide
+# Shapely — Codex Guide
 
 ## Project Overview
 Shapely is an AI-powered mobile app that transforms user-written text into platform-optimized, context-aware content. Users pick a destination (e.g. LinkedIn post, cover letter, Instagram caption) and the app rewrites their input in the appropriate tone and style using OpenAI GPT-4o.

@@ -1,56 +1,64 @@
-import { useState, useRef } from 'react';
+import { useTheme } from "@/hooks/useTheme";
+import { auth } from "@/lib/firebase";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
+import { signInWithEmailAndPassword } from "@react-native-firebase/auth";
+import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
+import { useRef, useState } from "react";
+import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import {
-  View,
+  ActivityIndicator,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  Image,
-  ActivityIndicator,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
-import { Ionicons, AntDesign } from '@expo/vector-icons';
-import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
-import { useTheme } from '@/hooks/useTheme';
-import { auth } from '@/lib/firebase';
-import { signInWithEmailAndPassword } from '@react-native-firebase/auth';
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { moderateScale, scale, verticalScale } from "react-native-size-matters";
 
-const appIcon = require('@/assets/images/icon.png');
+const appIcon = require("@/assets/images/icon.png");
+const logoShapely = require("@/assets/shapely/logoShapely.png");
 
 export default function LoginScreen() {
   const theme = useTheme();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const { t } = useTranslation();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const passwordRef = useRef<TextInput>(null);
 
   const handleLogin = async () => {
     if (!email || !password) {
-      setError('Please fill in all fields.');
+      setError(t('errors.fillAllFields'));
       return;
     }
     setLoading(true);
     setError(null);
     try {
-      console.log('[Login] Attempting sign-in for:', email.trim());
+      console.log("[Login] Attempting sign-in for:", email.trim());
       await signInWithEmailAndPassword(auth, email.trim(), password);
-      console.log('[Login] Sign-in successful');
-      router.replace('/(tabs)');
+      console.log("[Login] Sign-in successful");
+      router.replace("/(tabs)");
     } catch (err: unknown) {
       const code = (err as { code?: string }).code;
-      console.error('[Login] Error code:', code, '| Full error:', err);
-      if (code === 'auth/user-not-found' || code === 'auth/wrong-password' || code === 'auth/invalid-credential') {
-        setError('Invalid email or password.');
-      } else if (code === 'auth/invalid-email') {
-        setError('Please enter a valid email address.');
+      console.error("[Login] Error code:", code, "| Full error:", err);
+      if (
+        code === "auth/user-not-found" ||
+        code === "auth/wrong-password" ||
+        code === "auth/invalid-credential"
+      ) {
+        setError(t('errors.invalidCredentials'));
+      } else if (code === "auth/invalid-email") {
+        setError(t('errors.invalidEmail'));
       } else {
-        setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
+        setError(t('errors.loginFailed'));
       }
     } finally {
       setLoading(false);
@@ -58,31 +66,21 @@ export default function LoginScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView
+      style={[styles.safe, { backgroundColor: theme.colors.background }]}
+    >
       <KeyboardAvoidingView
         style={styles.kav}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <ScrollView
           contentContainerStyle={styles.scroll}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {/* Top bar */}
-          <View style={styles.topBar}>
-            <Ionicons name="sparkles" size={moderateScale(18)} color={theme.colors.primary} />
-            <Text
-              style={[
-                styles.brandText,
-                { color: theme.colors.primary, fontFamily: theme.typography.fonts.bold, fontSize: theme.typography.sizes.lg },
-              ]}
-            >
-              Shapely
-            </Text>
-          </View>
-
           {/* Logo card */}
-          <View
+          <Animated.View
+            entering={FadeIn.duration(300)}
             style={[
               styles.logoCard,
               {
@@ -92,31 +90,44 @@ export default function LoginScreen() {
               },
             ]}
           >
-            <Image source={appIcon} style={styles.logoImage} resizeMode="cover" />
-          </View>
+            <Image
+              source={logoShapely}
+              style={styles.logoImage}
+              resizeMode="cover"
+            />
+          </Animated.View>
 
           {/* Heading */}
-          <View style={styles.headingBlock}>
+          <Animated.View entering={FadeInDown.duration(400).delay(80)} style={styles.headingBlock}>
             <Text
               style={[
                 styles.title,
-                { color: theme.colors.textPrimary, fontFamily: theme.typography.fonts.bold, fontSize: theme.typography.sizes.xxl },
+                {
+                  color: theme.colors.textPrimary,
+                  fontFamily: theme.typography.fonts.bold,
+                  fontSize: theme.typography.sizes.xxl,
+                },
               ]}
             >
-              Login
+              {t('auth.login.title')}
             </Text>
             <Text
               style={[
                 styles.subtitle,
-                { color: theme.colors.textSecondary, fontFamily: theme.typography.fonts.medium, fontSize: theme.typography.sizes.sm },
+                {
+                  color: theme.colors.textSecondary,
+                  fontFamily: theme.typography.fonts.medium,
+                  fontSize: theme.typography.sizes.sm,
+                },
               ]}
             >
-              Welcome back to your curated workspace
+              {t('auth.login.subtitle')}
             </Text>
-          </View>
+          </Animated.View>
 
           {/* Form card */}
-          <View
+          <Animated.View
+            entering={FadeInDown.duration(450).delay(160)}
             style={[
               styles.formCard,
               {
@@ -130,16 +141,29 @@ export default function LoginScreen() {
             <View
               style={[
                 styles.inputWrapper,
-                { backgroundColor: theme.colors.background, borderColor: theme.colors.border, borderRadius: theme.radius.md },
+                {
+                  backgroundColor: theme.colors.background,
+                  borderColor: theme.colors.border,
+                  borderRadius: theme.radius.md,
+                },
               ]}
             >
-              <Ionicons name="mail-outline" size={moderateScale(18)} color={theme.colors.textSecondary} style={styles.inputIcon} />
+              <Ionicons
+                name="mail-outline"
+                size={moderateScale(18)}
+                color={theme.colors.textSecondary}
+                style={styles.inputIcon}
+              />
               <TextInput
                 style={[
                   styles.input,
-                  { color: theme.colors.textPrimary, fontFamily: theme.typography.fonts.regular, fontSize: theme.typography.sizes.md },
+                  {
+                    color: theme.colors.textPrimary,
+                    fontFamily: theme.typography.fonts.regular,
+                    fontSize: theme.typography.sizes.md,
+                  },
                 ]}
-                placeholder="Email Address"
+                placeholder={t('auth.login.emailPlaceholder')}
                 placeholderTextColor={theme.colors.textDisabled}
                 value={email}
                 onChangeText={setEmail}
@@ -156,17 +180,30 @@ export default function LoginScreen() {
             <View
               style={[
                 styles.inputWrapper,
-                { backgroundColor: theme.colors.background, borderColor: theme.colors.border, borderRadius: theme.radius.md },
+                {
+                  backgroundColor: theme.colors.background,
+                  borderColor: theme.colors.border,
+                  borderRadius: theme.radius.md,
+                },
               ]}
             >
-              <Ionicons name="lock-closed-outline" size={moderateScale(18)} color={theme.colors.textSecondary} style={styles.inputIcon} />
+              <Ionicons
+                name="lock-closed-outline"
+                size={moderateScale(18)}
+                color={theme.colors.textSecondary}
+                style={styles.inputIcon}
+              />
               <TextInput
                 ref={passwordRef}
                 style={[
                   styles.input,
-                  { color: theme.colors.textPrimary, fontFamily: theme.typography.fonts.regular, fontSize: theme.typography.sizes.md },
+                  {
+                    color: theme.colors.textPrimary,
+                    fontFamily: theme.typography.fonts.regular,
+                    fontSize: theme.typography.sizes.md,
+                  },
                 ]}
-                placeholder="Password"
+                placeholder={t('auth.login.passwordPlaceholder')}
                 placeholderTextColor={theme.colors.textDisabled}
                 value={password}
                 onChangeText={setPassword}
@@ -181,15 +218,19 @@ export default function LoginScreen() {
             <TouchableOpacity
               activeOpacity={0.7}
               style={styles.forgotLink}
-              onPress={() => router.push('/(auth)/forgot-password')}
+              onPress={() => router.push("/(auth)/forgot-password")}
             >
               <Text
                 style={[
                   styles.forgotText,
-                  { color: theme.colors.primary, fontFamily: theme.typography.fonts.medium, fontSize: theme.typography.sizes.sm },
+                  {
+                    color: theme.colors.primary,
+                    fontFamily: theme.typography.fonts.medium,
+                    fontSize: theme.typography.sizes.sm,
+                  },
                 ]}
               >
-                Forgot password?
+                {t('auth.login.forgotPassword')}
               </Text>
             </TouchableOpacity>
 
@@ -198,15 +239,20 @@ export default function LoginScreen() {
               <Text
                 style={[
                   styles.errorText,
-                  { color: theme.colors.error, fontFamily: theme.typography.fonts.regular, fontSize: theme.typography.sizes.xs },
+                  {
+                    color: theme.colors.error,
+                    fontFamily: theme.typography.fonts.regular,
+                    fontSize: theme.typography.sizes.xs,
+                  },
                 ]}
               >
                 {error}
               </Text>
             )}
-          </View>
+          </Animated.View>
 
           {/* Login button */}
+          <Animated.View entering={FadeInDown.duration(300).delay(260)}>
           <TouchableOpacity
             activeOpacity={0.95}
             disabled={loading}
@@ -225,85 +271,148 @@ export default function LoginScreen() {
                 <Text
                   style={[
                     styles.loginButtonText,
-                    { fontFamily: theme.typography.fonts.semiBold, fontSize: theme.typography.sizes.md },
+                    {
+                      fontFamily: theme.typography.fonts.semiBold,
+                      fontSize: theme.typography.sizes.md,
+                    },
                   ]}
                 >
-                  Login →
+                  {t('auth.login.button')}
                 </Text>
               )}
             </LinearGradient>
           </TouchableOpacity>
+          </Animated.View>
 
           {/* Social divider */}
-          <View style={styles.dividerRow}>
-            <View style={[styles.dividerLine, { backgroundColor: theme.colors.border }]} />
+          <Animated.View entering={FadeInDown.duration(300).delay(340)} style={styles.dividerRow}>
+            <View
+              style={[
+                styles.dividerLine,
+                { backgroundColor: theme.colors.border },
+              ]}
+            />
             <Text
               style={[
                 styles.dividerText,
-                { color: theme.colors.textSecondary, fontFamily: theme.typography.fonts.medium, fontSize: theme.typography.sizes.xs },
+                {
+                  color: theme.colors.textSecondary,
+                  fontFamily: theme.typography.fonts.medium,
+                  fontSize: theme.typography.sizes.xs,
+                },
               ]}
             >
-              OR CONTINUE WITH
+              {t('auth.login.orContinueWith')}
             </Text>
-            <View style={[styles.dividerLine, { backgroundColor: theme.colors.border }]} />
-          </View>
+            <View
+              style={[
+                styles.dividerLine,
+                { backgroundColor: theme.colors.border },
+              ]}
+            />
+          </Animated.View>
 
           {/* Social buttons */}
-          <View style={styles.socialRow}>
+          <Animated.View entering={FadeInDown.duration(300).delay(400)} style={styles.socialRow}>
             <TouchableOpacity
               activeOpacity={0.8}
-              style={[styles.socialButton, { borderColor: theme.colors.border, backgroundColor: theme.colors.surface, borderRadius: theme.radius.pill }]}
-              onPress={() => { /* TODO: Google sign-in */ }}
+              style={[
+                styles.socialButton,
+                {
+                  borderColor: theme.colors.border,
+                  backgroundColor: theme.colors.surface,
+                  borderRadius: theme.radius.pill,
+                },
+              ]}
+              onPress={() => {
+                /* TODO: Google sign-in */
+              }}
             >
-              <AntDesign name="google" size={moderateScale(18)} color={theme.colors.textPrimary} />
+              <AntDesign
+                name="google"
+                size={moderateScale(18)}
+                color={theme.colors.textPrimary}
+              />
               <Text
                 style={[
                   styles.socialButtonText,
-                  { color: theme.colors.textPrimary, fontFamily: theme.typography.fonts.medium, fontSize: theme.typography.sizes.sm },
+                  {
+                    color: theme.colors.textPrimary,
+                    fontFamily: theme.typography.fonts.medium,
+                    fontSize: theme.typography.sizes.sm,
+                  },
                 ]}
               >
-                Google
+                {t('auth.login.google')}
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               activeOpacity={0.8}
-              style={[styles.socialButton, { borderColor: theme.colors.border, backgroundColor: theme.colors.surface, borderRadius: theme.radius.pill }]}
-              onPress={() => { /* TODO: Apple sign-in */ }}
+              style={[
+                styles.socialButton,
+                {
+                  borderColor: theme.colors.border,
+                  backgroundColor: theme.colors.surface,
+                  borderRadius: theme.radius.pill,
+                },
+              ]}
+              onPress={() => {
+                /* TODO: Apple sign-in */
+              }}
             >
-              <AntDesign name="apple1" size={moderateScale(18)} color={theme.colors.textPrimary} />
+              <AntDesign
+                name="apple"
+                size={moderateScale(18)}
+                color={theme.colors.textPrimary}
+              />
               <Text
                 style={[
                   styles.socialButtonText,
-                  { color: theme.colors.textPrimary, fontFamily: theme.typography.fonts.medium, fontSize: theme.typography.sizes.sm },
+                  {
+                    color: theme.colors.textPrimary,
+                    fontFamily: theme.typography.fonts.medium,
+                    fontSize: theme.typography.sizes.sm,
+                  },
                 ]}
               >
-                Apple
+                {t('auth.login.apple')}
               </Text>
             </TouchableOpacity>
-          </View>
+          </Animated.View>
 
           {/* Footer */}
-          <View style={styles.footer}>
+          <Animated.View entering={FadeInDown.duration(300).delay(460)} style={styles.footer}>
             <Text
               style={[
                 styles.footerText,
-                { color: theme.colors.textSecondary, fontFamily: theme.typography.fonts.regular, fontSize: theme.typography.sizes.sm },
+                {
+                  color: theme.colors.textSecondary,
+                  fontFamily: theme.typography.fonts.regular,
+                  fontSize: theme.typography.sizes.sm,
+                },
               ]}
             >
-              Don't have an account?{' '}
+              {t('auth.login.noAccount')}
             </Text>
-            <TouchableOpacity activeOpacity={0.7} onPress={() => router.push('/(auth)/register')}>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => router.push("/(auth)/register")}
+            >
               <Text
                 style={[
                   styles.footerLink,
-                  { color: theme.colors.primary, fontFamily: theme.typography.fonts.semiBold, fontSize: theme.typography.sizes.sm },
+                  {
+                    color: theme.colors.primary,
+                    fontFamily: theme.typography.fonts.semiBold,
+                    fontSize: theme.typography.sizes.sm,
+                  },
                 ]}
               >
-                Sign Up
+                {t('auth.login.signUp')}
               </Text>
             </TouchableOpacity>
-          </View>
+          </Animated.View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -324,55 +433,59 @@ const styles = StyleSheet.create({
     paddingBottom: verticalScale(32),
   },
   topBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: scale(6),
     marginBottom: verticalScale(32),
   },
   brandText: {},
+  brandLogoImage: {
+    height: verticalScale(28),
+    width: scale(110),
+  },
   logoCard: {
-    alignSelf: 'center',
-    width: moderateScale(80),
-    height: moderateScale(80),
+    alignSelf: "center",
+    width: moderateScale(180),
+    height: moderateScale(180),
     borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: moderateScale(4) },
     shadowOpacity: 0.08,
     shadowRadius: moderateScale(12),
     elevation: 4,
   },
   logoImage: {
-    width: moderateScale(56),
-    height: moderateScale(56),
+    width: moderateScale(260),
+    height: moderateScale(260),
     borderRadius: moderateScale(14),
   },
   headingBlock: {
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: verticalScale(24),
     marginBottom: verticalScale(24),
     gap: verticalScale(6),
   },
   title: {
-    textAlign: 'center',
+    textAlign: "center",
   },
   subtitle: {
-    textAlign: 'center',
+    textAlign: "center",
   },
   formCard: {
     borderWidth: 1,
     padding: scale(20),
     gap: verticalScale(12),
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: moderateScale(4) },
     shadowOpacity: 0.06,
     shadowRadius: moderateScale(12),
     elevation: 3,
   },
   inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     height: verticalScale(50),
     borderWidth: 1,
     paddingHorizontal: scale(14),
@@ -384,27 +497,27 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   forgotLink: {
-    alignSelf: 'flex-end',
+    alignSelf: "flex-end",
   },
   forgotText: {},
   errorText: {
-    textAlign: 'center',
+    textAlign: "center",
   },
   loginButtonOuter: {
-    width: '100%',
+    width: "100%",
     marginTop: verticalScale(16),
   },
   loginButton: {
     height: verticalScale(52),
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   loginButtonText: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
   },
   dividerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginVertical: verticalScale(20),
     gap: scale(10),
   },
@@ -413,27 +526,27 @@ const styles = StyleSheet.create({
     height: 1,
   },
   dividerText: {
-    textTransform: 'uppercase',
+    textTransform: "uppercase",
     letterSpacing: 0.8,
   },
   socialRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: scale(12),
   },
   socialButton: {
     flex: 1,
     height: verticalScale(48),
     borderWidth: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     gap: scale(8),
   },
   socialButtonText: {},
   footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     marginTop: verticalScale(24),
   },
   footerText: {},

@@ -1,5 +1,6 @@
 import { useTheme } from "@/hooks/useTheme";
 import { auth, firestore } from "@/lib/firebase";
+import { useTranslation } from "react-i18next";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import {
   createUserWithEmailAndPassword,
@@ -9,6 +10,7 @@ import { doc, serverTimestamp, setDoc } from "@react-native-firebase/firestore";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useRef, useState } from "react";
+import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import {
   ActivityIndicator,
   Image,
@@ -54,6 +56,7 @@ const STRENGTH_COLORS: Record<StrengthLevel, string> = {
 
 export default function RegisterScreen() {
   const theme = useTheme();
+  const { t } = useTranslation();
 
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -71,19 +74,19 @@ export default function RegisterScreen() {
 
   const handleRegister = async () => {
     if (!fullName || !email || !password || !confirm) {
-      setError("Please fill in all fields.");
+      setError(t('errors.fillAllFields'));
       return;
     }
     if (password !== confirm) {
-      setError("Passwords do not match.");
+      setError(t('errors.passwordsDoNotMatch'));
       return;
     }
     if (password.length < 6) {
-      setError("Password must be at least 6 characters.");
+      setError(t('errors.passwordTooShort'));
       return;
     }
     if (!agreed) {
-      setError("Please agree to the Terms of Service and Privacy Policy.");
+      setError(t('errors.agreeToTerms'));
       return;
     }
 
@@ -116,17 +119,13 @@ export default function RegisterScreen() {
       const code = (err as { code?: string }).code;
       console.error("[Register] Error code:", code, "| Full error:", err);
       if (code === "auth/email-already-in-use") {
-        setError("An account with this email already exists.");
+        setError(t('errors.emailAlreadyExists'));
       } else if (code === "auth/invalid-email") {
-        setError("Please enter a valid email address.");
+        setError(t('errors.invalidEmail'));
       } else if (code === "auth/weak-password") {
-        setError("Password is too weak. Use at least 6 characters.");
+        setError(t('errors.passwordTooWeak'));
       } else {
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Registration failed. Please try again.",
-        );
+        setError(t('errors.registrationFailed'));
       }
     } finally {
       setLoading(false);
@@ -148,7 +147,7 @@ export default function RegisterScreen() {
           showsVerticalScrollIndicator={false}
         >
           {/* Top bar — centered */}
-          <View style={styles.topBar}>
+          <Animated.View entering={FadeIn.duration(300)} style={styles.topBar}>
             <Image source={appIcon} style={styles.topIcon} resizeMode="cover" />
             <Text
               style={[
@@ -160,12 +159,12 @@ export default function RegisterScreen() {
                 },
               ]}
             >
-              Shapely
+              {t('common.appName')}
             </Text>
-          </View>
+          </Animated.View>
 
           {/* Heading */}
-          <View style={styles.headingBlock}>
+          <Animated.View entering={FadeInDown.duration(400).delay(80)} style={styles.headingBlock}>
             <Text
               style={[
                 styles.title,
@@ -176,7 +175,7 @@ export default function RegisterScreen() {
                 },
               ]}
             >
-              Create Account
+              {t('auth.register.title')}
             </Text>
             <Text
               style={[
@@ -188,12 +187,12 @@ export default function RegisterScreen() {
                 },
               ]}
             >
-              Start your journey with our editorial workspace.
+              {t('auth.register.subtitle')}
             </Text>
-          </View>
+          </Animated.View>
 
           {/* Full Name */}
-          <View style={styles.fieldGroup}>
+          <Animated.View entering={FadeInDown.duration(400).delay(160)} style={styles.fieldGroup}>
             <Text
               style={[
                 styles.fieldLabel,
@@ -204,7 +203,7 @@ export default function RegisterScreen() {
                 },
               ]}
             >
-              FULL NAME
+              {t('auth.register.fullName')}
             </Text>
             <View
               style={[
@@ -225,7 +224,7 @@ export default function RegisterScreen() {
                     fontSize: theme.typography.sizes.md,
                   },
                 ]}
-                placeholder="Julien Vellum"
+                placeholder={t('auth.register.namePlaceholder')}
                 placeholderTextColor={theme.colors.textDisabled}
                 value={fullName}
                 onChangeText={setFullName}
@@ -236,10 +235,10 @@ export default function RegisterScreen() {
                 onSubmitEditing={() => emailRef.current?.focus()}
               />
             </View>
-          </View>
+          </Animated.View>
 
           {/* Email Address */}
-          <View style={styles.fieldGroup}>
+          <Animated.View entering={FadeInDown.duration(400).delay(220)} style={styles.fieldGroup}>
             <Text
               style={[
                 styles.fieldLabel,
@@ -250,7 +249,7 @@ export default function RegisterScreen() {
                 },
               ]}
             >
-              EMAIL ADDRESS
+              {t('auth.register.emailAddress')}
             </Text>
             <View
               style={[
@@ -272,7 +271,7 @@ export default function RegisterScreen() {
                     fontSize: theme.typography.sizes.md,
                   },
                 ]}
-                placeholder="julien@shapely.io"
+                placeholder={t('auth.register.emailPlaceholder')}
                 placeholderTextColor={theme.colors.textDisabled}
                 value={email}
                 onChangeText={setEmail}
@@ -284,10 +283,10 @@ export default function RegisterScreen() {
                 onSubmitEditing={() => passwordRef.current?.focus()}
               />
             </View>
-          </View>
+          </Animated.View>
 
           {/* Password */}
-          <View style={styles.fieldGroup}>
+          <Animated.View entering={FadeInDown.duration(400).delay(280)} style={styles.fieldGroup}>
             <Text
               style={[
                 styles.fieldLabel,
@@ -298,7 +297,7 @@ export default function RegisterScreen() {
                 },
               ]}
             >
-              PASSWORD
+              {t('auth.register.password')}
             </Text>
             <View
               style={[
@@ -330,10 +329,10 @@ export default function RegisterScreen() {
                 onSubmitEditing={() => confirmRef.current?.focus()}
               />
             </View>
-          </View>
+          </Animated.View>
 
           {/* Confirm */}
-          <View style={styles.fieldGroup}>
+          <Animated.View entering={FadeInDown.duration(400).delay(340)} style={styles.fieldGroup}>
             <Text
               style={[
                 styles.fieldLabel,
@@ -344,7 +343,7 @@ export default function RegisterScreen() {
                 },
               ]}
             >
-              CONFIRM
+              {t('auth.register.confirm')}
             </Text>
             <View
               style={[
@@ -376,7 +375,7 @@ export default function RegisterScreen() {
                 onSubmitEditing={handleRegister}
               />
             </View>
-          </View>
+          </Animated.View>
 
           {/* Password strength */}
           {password.length > 0 && (
@@ -391,7 +390,7 @@ export default function RegisterScreen() {
                   },
                 ]}
               >
-                SECURITY STRENGTH
+                {t('auth.register.securityStrength')}
               </Text>
               <Text
                 style={[
@@ -433,6 +432,7 @@ export default function RegisterScreen() {
           )}
 
           {/* Terms checkbox */}
+          <Animated.View entering={FadeInDown.duration(400).delay(400)}>
           <TouchableOpacity
             activeOpacity={0.7}
             style={styles.termsRow}
@@ -470,27 +470,28 @@ export default function RegisterScreen() {
                 },
               ]}
             >
-              I agree to the{" "}
+              {t('auth.register.agreePrefix')}
               <Text
                 style={{
                   color: theme.colors.primary,
                   textDecorationLine: "underline",
                 }}
               >
-                Terms of Service
-              </Text>{" "}
-              and{" "}
+                {t('auth.register.termsOfService')}
+              </Text>
+              {t('auth.register.and')}
               <Text
                 style={{
                   color: theme.colors.primary,
                   textDecorationLine: "underline",
                 }}
               >
-                Privacy Policy
+                {t('auth.register.privacyPolicy')}
               </Text>
               .
             </Text>
           </TouchableOpacity>
+          </Animated.View>
 
           {/* Error message */}
           {error && (
@@ -509,6 +510,7 @@ export default function RegisterScreen() {
           )}
 
           {/* Create Account button */}
+          <Animated.View entering={FadeInDown.duration(300).delay(460)}>
           <TouchableOpacity
             activeOpacity={0.95}
             disabled={loading}
@@ -536,14 +538,15 @@ export default function RegisterScreen() {
                     },
                   ]}
                 >
-                  Create Account →
+                  {t('auth.register.button')}
                 </Text>
               )}
             </LinearGradient>
           </TouchableOpacity>
+          </Animated.View>
 
           {/* Social connect */}
-          <View style={styles.dividerRow}>
+          <Animated.View entering={FadeInDown.duration(300).delay(520)} style={styles.dividerRow}>
             <View
               style={[
                 styles.dividerLine,
@@ -560,7 +563,7 @@ export default function RegisterScreen() {
                 },
               ]}
             >
-              SOCIAL CONNECT
+              {t('auth.register.socialConnect')}
             </Text>
             <View
               style={[
@@ -568,9 +571,9 @@ export default function RegisterScreen() {
                 { backgroundColor: theme.colors.border },
               ]}
             />
-          </View>
+          </Animated.View>
 
-          <View style={styles.socialRow}>
+          <Animated.View entering={FadeInDown.duration(300).delay(560)} style={styles.socialRow}>
             <TouchableOpacity
               activeOpacity={0.8}
               style={[
@@ -600,7 +603,7 @@ export default function RegisterScreen() {
                   },
                 ]}
               >
-                Google
+                {t('auth.register.google')}
               </Text>
             </TouchableOpacity>
 
@@ -633,13 +636,13 @@ export default function RegisterScreen() {
                   },
                 ]}
               >
-                Apple
+                {t('auth.register.apple')}
               </Text>
             </TouchableOpacity>
-          </View>
+          </Animated.View>
 
           {/* Footer */}
-          <View style={styles.footer}>
+          <Animated.View entering={FadeInDown.duration(300).delay(600)} style={styles.footer}>
             <Text
               style={[
                 styles.footerText,
@@ -650,7 +653,7 @@ export default function RegisterScreen() {
                 },
               ]}
             >
-              Already have an account?{" "}
+              {t('auth.register.alreadyHaveAccount')}
             </Text>
             <TouchableOpacity
               activeOpacity={0.7}
@@ -666,10 +669,10 @@ export default function RegisterScreen() {
                   },
                 ]}
               >
-                Login
+                {t('auth.register.login')}
               </Text>
             </TouchableOpacity>
-          </View>
+          </Animated.View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd:*)",
+      "Bash(powershell -Command \"\n\\\\$empty = New-Item -ItemType Directory -Path 'C:\\\\Users\\\\ziyad\\\\AppData\\\\Local\\\\Temp\\\\empty_dir_to_delete' -Force\nrobocopy 'C:\\\\Users\\\\ziyad\\\\AppData\\\\Local\\\\Temp\\\\empty_dir_to_delete' 'C:\\\\Users\\\\ziyad\\\\.gradle\\\\caches\\\\9.0.0\\\\transforms\\\\7e78006677391436fdf80732c1131b7c\\\\transformed\\\\datastore-preferences-proto-1.1.7' /PURGE /NFL /NDL /NJH /NJS /nc /ns /np 2>&1\nRemove-Item \\\\$empty -Force\nWrite-Host 'Robocopy purge done'\n\")",
+      "Bash(powershell -Command \"Get-Process robocopy -ErrorAction SilentlyContinue | Stop-Process -Force; Write-Host 'Killed'\")",
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d.get\\('errors', {}\\), indent=2\\)\\)\")"
+    ]
+  }
+}
