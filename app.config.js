@@ -72,8 +72,8 @@ export default ({ config }) => ({
         },
         android: {
           manifestMergerEnabled: true,
-          compileSdkVersion: 35,
-          targetSdkVersion: 34,
+          compileSdkVersion: 36,
+          targetSdkVersion: 35,
           extraMavenRepos: [],
         },
       },
