@@ -73,9 +73,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         },
         android: {
           manifestMergerEnabled: true,
+          compileSdkVersion: 35,
+          targetSdkVersion: 34,
+          extraMavenRepos: [],
         },
       },
     ],
+    "./plugins/withAndroidManifestFix",
   ],
 
   experiments: {
