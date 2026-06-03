@@ -1,6 +1,5 @@
-import { ConfigContext, ExpoConfig } from "expo/config";
-
-export default ({ config }: ConfigContext): ExpoConfig => ({
+/** @type {import('expo/config').ConfigContext} */
+export default ({ config }) => ({
   ...config,
 
   name: "Shapely",
